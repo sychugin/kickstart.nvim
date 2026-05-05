@@ -520,8 +520,6 @@ require('lazy').setup({
         ---@diagnostic disable-next-line: missing-fields
         opts = {},
       },
-      -- Maps LSP server names between nvim-lspconfig and Mason package names.
-      'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
@@ -636,9 +634,12 @@ require('lazy').setup({
         pyright = {
           settings = {
             python = {
-              pythonPath = vim.fn.exepath 'python3' ~= '' and vim.fn.exepath 'python3'
-                or vim.fn.exepath 'python'
-                or '/opt/homebrew/Caskroom/miniconda/base/bin/python',
+              pythonPath = (function()
+                local p3 = vim.fn.exepath 'python3'
+                return p3 ~= '' and p3
+                  or vim.fn.exepath 'python'
+                  or '/opt/homebrew/Caskroom/miniconda/base/bin/python'
+              end)(),
               analysis = {
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
@@ -654,8 +655,6 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
-
-        stylua = {}, -- Used to format Lua code
 
         -- Special Lua Config, as recommended by neovim help docs
         lua_ls = {
@@ -701,7 +700,11 @@ require('lazy').setup({
       -- You can press `g?` for help in this menu.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        -- You can add other tools here that you want Mason to install
+        'stylua',
+        'isort',
+        'black',
+        'clang-format',
+        'latexindent',
       })
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -790,6 +793,7 @@ require('lazy').setup({
         },
         opts = {},
       },
+      'folke/lazydev.nvim',
     },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
@@ -835,7 +839,10 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        providers = {
+          lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+        },
       },
 
       snippets = { preset = 'luasnip' },
