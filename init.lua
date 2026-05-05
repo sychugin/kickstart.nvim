@@ -698,16 +698,21 @@ require('lazy').setup({
       --    :Mason
       --
       -- You can press `g?` for help in this menu.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua',
-        'isort',
-        'black',
-        'clang-format',
-        'latexindent',
-      })
-
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-tool-installer').setup {
+        ensure_installed = {
+          -- LSP servers (mason package names differ from lspconfig names)
+          'lua-language-server',
+          'clangd',
+          'texlab',
+          'pyright',
+          -- Formatters
+          'stylua',
+          'isort',
+          'black',
+          'clang-format',
+          'latexindent',
+        },
+      }
 
       for name, server in pairs(servers) do
         vim.lsp.config(name, server)
